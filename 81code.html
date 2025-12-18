@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机号81数理解读工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft Yahei', sans-serif;
+        }
+        
+        body {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #409eff;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #409eff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #337ecc;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        
+        .result h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .result-item {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            color: #555;
+            display: inline-block;
+            width: 100px;
+        }
+        
+        .warning {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fff3cd;
+            color: #856404;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .fortune-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        
+        .level-great {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .level-good {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .level-mixed {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .level-bad {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .copy-btn {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>手机号81数理解读工具</h1>
+        
+        <div class="input-group">
+            <label for="mobileInput">请输入手机号或手机号后四位</label>
+            <input type="text" id="mobileInput" placeholder="例如：13062890564 或 0564">
+            <div class="error" id="errorMsg">输入无效！请输入4位或11位数字</div>
+        </div>
+        
+        <button id="calculateBtn">开始解读</button>
+        
+        <div class="result" id="resultBox">
+            <h3>计算结果</h3>
+            <div class="result-item">
+                <span class="result-label">手机号末四位：</span>
+                <span id="numSegment"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">对应81数理：</span>
+                <span id="mathNum"></span>
+                <span id="fortuneLevel" class="fortune-level"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">数理解读：</span>
+                <span id="interpretation"></span>
+            </div>
+            <button class="copy-btn" id="copyBtn">复制结果</button>
+            <div class="warning">注：结果仅为趣味参考，无科学依据。</div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">已复制到剪贴板</div>
+
+    <script>
+        // 完整81数理解读表
+        const fortuneTable = {
+            1: "大吉：（太极之数）万物开泰，生发无穷，利禄亨通，为宇宙起源之吉数。",
+            2: "大凶：（两仪之数）混沌未定，分离破败，进退保守，难以达成志向。",
+            3: "大吉：（三才之数）天地人和，进取如意，可助事业增进繁荣，属首领运暗示数。",
+            4: "大凶：（四象之数）破败凶变，万事休止，还属孤独运暗示数，多遇逆境。",
+            5: "大吉：（五行之数）福禄长寿，福德集门，兼具女德运与温和运暗示数。",
+            6: "大吉：（六爻之数）安稳余庆，吉人天相，含女德运与温和运，虽有小波折但终吉。",
+            7: "吉：（七政之数）刚毅果断，勇往直前，精悍严谨，得吉星照耀，属刚情运暗示数。",
+            8: "半吉：（八卦之数）意志刚健，勤勉发展，卦象涵盖万物，运势平缓无大起伏。",
+            9: "大凶：（大成之数）兴尽凶始，穷乏困苦，蕴涵凶险，成败难以把握。",
+            10: "大凶：（终结之数）万事终局，充满损耗，雪暗飘零，回顾过往多有茫然。",
+            11: "大吉：（旱苗逢雨）稳健吉顺，富贵荣达，万物更新，兼具女德运与温和运。",
+            12: "大凶：（掘井无泉）意志薄弱，家庭寂寞，发展态势薄弱，难酬心中志向。",
+            13: "大吉：（春日牡丹）智略超群，博学多才，才艺多能，兼具首领运与艺能运。",
+            14: "大凶：（破兆）沦落天涯，失意烦闷，家庭缘薄，孤独遭难，谋事多败。",
+            15: "大吉：（福寿）福寿双全，立身兴家，富贵荣誉，属财富运与温和运暗示数。",
+            16: "大吉：（厚重）贵人相助，兴家兴业，财官双美，兼具首领运与财富运。",
+            17: "半吉：（刚强）突破万难，刚柔兼备，虽权威刚强，但需容忍方能成功，属刚情运。",
+            18: "大吉：（铁镜重磨）有志竟成，内名有运，权威显达，兼具艺能运暗示数。",
+            19: "大凶：（多难）风云蔽日，辛苦重来，虽有智谋，但万事皆遇挫折。",
+            20: "大凶：（屋下藏金）非业破运，灾难重重，进退维谷，凡事难以成功。",
+            21: "大吉：（明月中天）明月光照，独立权威，官运亨通，属首领运，但女性有此数易陷孤寡。",
+            22: "大凶：（秋草逢霜）两士相争，困难疾弱，即便出豪杰，人生也波折不断。",
+            23: "大吉：（壮丽）旭日东升，质实刚坚，权威旺盛，属首领运，女性得此数恐孤寡。",
+            24: "大吉：（掘藏得金）家门余庆，金钱丰盈，白手可获巨财，属财富运暗示数。",
+            25: "大吉：（荣俊）英俊刚毅，资性聪敏，虽有傲气，克服后可获成功。",
+            26: "半吉：（变怪）变怪奇异，属豪侠数，虽有英雄气概，但波澜重叠，吉凶参半。",
+            27: "半凶半吉：（增长）足智多谋，先苦后甜，欲望无度，自我意识强烈，易遭毁谤。",
+            28: "大凶：（阔水浮萍）遭难之数，豪杰气概，四海漂泊，终世浮躁。",
+            29: "大吉：（智谋）智谋优秀，财力归集，名闻海内，成就大业。",
+            30: "半凶半吉：（非运）沉浮不定，凶吉难分，若明若暗，大成大败。",
+            31: "大吉：（春日花开）智勇得志，博得名利，统领众人，繁荣富贵。",
+            32: "大吉：（宝马金鞍）侥幸多望，贵人得助，财帛如裕，繁荣至上。",
+            33: "大吉：（旭日升天）鸾凤相会，功名荣达，威震天下，属首领运。",
+            34: "大凶：（破家）破家之身，见识短小，辛苦遭逢，灾祸至极。",
+            35: "大吉：（高楼望月）温和平静，智达通畅，文昌技艺，奏功洋洋。",
+            36: "半凶半吉：（波澜重叠）波澜重叠，沉浮万状，侠肝义胆，舍己成仁。",
+            37: "大吉：（猛虎出林）权威显达，热诚忠信，宜着雅量，终身荣富。",
+            38: "半吉：（磨铁成针）意志薄弱，刻意经营，才识不凡，技艺有成。",
+            39: "大吉：（富贵荣华）富贵荣华，财帛丰盈，暗藏险象，德泽四方。",
+            40: "半凶半吉：（退安）智谋胆力，冒险投机，沉浮不定，退保平安。",
+            41: "大吉：（有德）纯阳独秀，德高望重，和顺畅达，博得名利。",
+            42: "半凶半吉：（寒蝉在柳）博识多能，精通世情，如能专心，尚可成功。",
+            43: "凶：（散财破产）散财破产，诸事不遂，虽有智谋，财来财去。",
+            44: "凶：（烦闷）破家亡身，暗藏惨淡，事不如意，乱世怪杰。",
+            45: "大吉：（顺风）新生泰和，顺风扬帆，智谋经纬，富贵繁荣。",
+            46: "凶：（浪里淘金）载宝沉舟，浪里淘金，大难尝尽，大功有成。",
+            47: "大吉：（点石成金）花开之象，万事如意，祯祥吉庆，天赋幸福。",
+            48: "大吉：（古松立鹤）智谋兼备，德量荣达，威望成师，洋洋大观。",
+            49: "半凶半吉：（转变）吉临则吉，凶来则凶，转凶为吉，配好三才。",
+            50: "半凶半吉：（小舟入海）一成一败，吉凶参半，先得庇荫，后遭凄惨。",
+            51: "半凶半吉：（沉浮）盛衰交加，波澜重叠，如能慎始，必获成功。",
+            52: "大吉：（达眼）卓识达眼，先见之明，智谋超群，名利双收。",
+            53: "凶：（曲卷难星）外祥内患，外祸内安，先富后贫，先贫后富。",
+            54: "凶：（石上栽花）石上栽花，难得有活，忧闷烦来，辛惨不绝。",
+            55: "半凶半吉：（善恶）善善得恶，恶恶得善，吉到极限，反生凶险。",
+            56: "凶：（浪里行舟）历尽艰辛，四周障碍，万事龃龌，做事难成。",
+            57: "大吉：（日照春松）寒雪青松，夜莺吟春，必遭一过，繁荣白事。",
+            58: "半凶半吉：（晚行遇月）沉浮多端，先苦后甜，宽宏扬名，富贵繁荣。",
+            59: "凶：（寒蝉悲风）寒蝉悲风，意志衰退，缺乏忍耐，苦难不休。",
+            60: "凶：（无谋）无谋之人，漂泊不定，晦暝暗黑，动摇不安。",
+            61: "半吉：（牡丹芙蓉）牡丹芙蓉，花开富贵，名利双收，定享天赋。",
+            62: "凶：（衰败）衰败之象，内外不和，志望难达，灾祸频来。",
+            63: "大吉：（舟归平海）富贵荣华，身心安泰，雨露惠泽，万事亨通。",
+            64: "凶：（非命）骨肉分离，孤独悲愁，难得心安，做事不成。",
+            65: "大吉：（巨流归海）天长地久，家运隆昌，福寿绵长，事事成就。",
+            66: "凶：（岩头步马）进退维谷，艰难不堪，等待时机，一跃而起。",
+            67: "大吉：（顺风通达）天赋幸运，四通八达，家道繁昌，富贵东来。",
+            68: "大吉：（顺风吹帆）智虑周密，集众信达，发明能智，拓展昂进。",
+            69: "凶：（非业）非业非力，精神迫滞，灾害交至，遍偿痛苦。",
+            70: "凶：（残菊逢霜）残菊逢霜，寂寞无碍，惨淡忧愁，晚景凄凉。",
+            71: "半吉：（石上金花）石上金花，内心劳苦，贯彻始终，可获成功。",
+            72: "凶：（劳苦）荣苦相伴，阴云覆月，外表吉祥，内实凶祸。",
+            73: "半吉：（无勇）盛衰交加，徒有高志，天王福祉，终世平安。",
+            74: "凶：（残菊经霜）残菊经霜，秋叶寂寞，无能无智，辛苦繁多。",
+            75: "半凶半吉：（退守）退守保吉，发迹甚迟，虽有吉象，无谋难成。",
+            76: "凶：（离散）倾覆离散，骨肉分离，内外不和，虽劳无功。",
+            77: "半吉：（半吉）家庭有悦，半吉半凶，能获援护，陷落不幸。",
+            78: "半凶半吉：（晚苦）祸福参半，先天智能，中年发达，晚景困苦。",
+            79: "凶：（云头望月）云头望月，身疲力尽，穷迫不伸，精神不定。",
+            80: "半凶半吉：（遁吉）辛苦不绝，早入隐遁，安心立命，化凶转吉。",
+            81: "大吉：（万物回春）最吉之数，还本归元，吉祥重叠，富贵尊荣。"
+        };
+
+        // 获取DOM元素
+        const mobileInput = document.getElementById('mobileInput');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultBox = document.getElementById('resultBox');
+        const errorMsg = document.getElementById('errorMsg');
+        const numSegmentEl = document.getElementById('numSegment');
+        const mathNumEl = document.getElementById('mathNum');
+        const interpretationEl = document.getElementById('interpretation');
+        const fortuneLevelEl = document.getElementById('fortuneLevel');
+        const copyBtn = document.getElementById('copyBtn');
+        const toast = document.getElementById('toast');
+        
+        // 提取吉凶等级的函数
+        function getFortuneLevel(interpretation) {
+            if (interpretation.startsWith('大吉')) {
+                return { text: '大吉', class: 'level-great' };
+            } else if (interpretation.startsWith('吉')) {
+                return { text: '吉', class: 'level-good' };
+            } else if (interpretation.startsWith('半吉') || interpretation.startsWith('半凶半吉') || interpretation.startsWith('半凶')) {
+                return { text: '半吉半凶', class: 'level-mixed' };
+            } else if (interpretation.startsWith('大凶')) {
+                return { text: '大凶', class: 'level-bad' };
+            } else if (interpretation.startsWith('凶')) {
+                return { text: '凶', class: 'level-bad' };
+            }
+            return { text: '', class: '' };
+        }
+        
+        // 显示提示信息
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+
+        // 计算函数
+        function calculate81Math() {
+            // 获取输入值并去除空格
+            const inputValue = mobileInput.value.trim();
+            
+            // 隐藏结果和错误信息
+            resultBox.style.display = 'none';
+            errorMsg.style.display = 'none';
+            
+            // 验证输入
+            if (!/^\d+$/.test(inputValue) || (inputValue.length !== 4 && inputValue.length !== 11)) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            // 获取末四位
+            let numSegment = inputValue.length === 4 ? inputValue : inputValue.slice(-4);
+            let num = parseInt(numSegment);
+            
+            // 计算81数理（修复计算逻辑）
+            let mathNum = num % 81;
+            // 如果余数为0，说明是81的倍数，对应81数理
+            if (mathNum === 0) {
+                mathNum = 81;
+            }
+            
+            // 获取解读结果
+            const interpretation = fortuneTable[mathNum] || "数理解读未收录";
+            
+            // 获取吉凶等级
+            const fortuneLevel = getFortuneLevel(interpretation);
+            
+            // 更新结果显示
+            numSegmentEl.textContent = numSegment;
+            mathNumEl.textContent = mathNum;
+            interpretationEl.textContent = interpretation;
+            fortuneLevelEl.textContent = fortuneLevel.text;
+            fortuneLevelEl.className = 'fortune-level ' + fortuneLevel.class;
+            
+            // 显示结果
+            resultBox.style.display = 'block';
+            
+            // 滚动到结果区域
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 绑定按钮点击事件
+        calculateBtn.addEventListener('click', calculate81Math);
+
+        // 绑定回车键事件
+        mobileInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate81Math();
+            }
+        });
+        
+        // 绑定复制按钮事件
+        copyBtn.addEventListener('click', function() {
+            const copyText = `手机号末四位：${numSegmentEl.textContent}\n对应81数理：${mathNumEl.textContent}\n吉凶：${fortuneLevelEl.textContent}\n数理解读：${interpretationEl.textContent}`;
+            
+            // 使用现代剪贴板API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(copyText).then(() => {
+                    showToast('已复制到剪贴板');
+                }).catch(() => {
+                    // 降级方案
+                    fallbackCopy(copyText);
+                });
+            } else {
+                // 降级方案
+                fallbackCopy(copyText);
+            }
+        });
+        
+        // 降级复制方案
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('已复制到剪贴板');
+            } catch (err) {
+                showToast('复制失败，请手动复制');
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
