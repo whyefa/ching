@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>道家八大神咒</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'KaiTi', '楷体', 'Microsoft Yahei', sans-serif;
+        }
+        
+        body {
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 桌面端侧边栏 */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            display: block;
+        }
+        
+        /* 桌面端隐藏小方块 */
+        .catalog-mini {
+            display: none;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-top: 10px;
+            }
+            
+            .container {
+                grid-template-columns: 1fr;
+                gap: 0;
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            /* 完整目录 */
+            .sidebar {
+                position: fixed !important;
+                top: 10px;
+                left: 10px;
+                right: auto;
+                width: auto;
+                height: auto !important;
+                padding: 0;
+                max-height: 80vh;
+                border-radius: 10px;
+                z-index: 100;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+                transition: all 0.3s ease;
+                overflow: hidden;
+                display: none !important;
+            }
+            
+            .sidebar.show {
+                display: block !important;
+            }
+            
+            /* 移动端显示小方块 */
+            .catalog-mini {
+                display: flex !important;
+            }
+            
+            .sidebar h2 {
+                font-size: 14px;
+                margin: 0;
+                padding: 12px 15px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                user-select: none;
+                border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            }
+            
+            .sidebar h2 .icon {
+                font-size: 16px;
+            }
+            
+            .catalog-wrapper {
+                max-height: calc(80vh - 50px);
+                overflow-y: auto;
+                padding: 10px 15px 15px;
+                min-width: 280px;
+            }
+            
+            .catalog {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            
+            .catalog a {
+                padding: 8px 10px;
+                font-size: 12px;
+                text-align: center;
+            }
+            
+            /* 收起的小方块 */
+            .catalog-mini {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                width: 60px;
+                height: 80px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+                border: 1px solid rgba(255, 215, 0, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 99;
+                transition: all 0.3s ease;
+                user-select: none;
+            }
+            
+            .catalog-mini:hover {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            }
+            
+            .catalog-mini.hidden {
+                display: none;
+            }
+            
+            .catalog-mini-text {
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                font-size: 18px;
+                font-weight: 500;
+                color: #667eea;
+                letter-spacing: 4px;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+                margin: 0;
+                border-radius: 0;
+                background: rgba(255, 255, 255, 0.85);
+                border: 1px solid rgba(102, 126, 234, 0.2);
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .spell-section {
+                padding: 20px 15px;
+                margin-bottom: 30px;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 12px;
+                border-left: 4px solid #667eea;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+                backdrop-filter: blur(3px);
+            }
+            
+            .spell-title {
+                font-size: 20px;
+            }
+            
+            .spell-content {
+                padding: 20px 15px;
+                font-size: 14px;
+                line-height: 1.8;
+                border-radius: 10px;
+                box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+            }
+            
+            .spell-content p {
+                margin-bottom: 10px;
+            }
+            
+            .back-to-top {
+                width: 45px;
+                height: 45px;
+                bottom: 80px;
+                right: 20px;
+                font-size: 18px;
+            }
+            
+            .voice-toggle {
+                width: 45px;
+                height: 45px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 20px;
+            }
+        }
+        
+        .sidebar h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .catalog {
+            list-style: none;
+        }
+        
+        .catalog li {
+            margin-bottom: 8px;
+        }
+        
+        .catalog a {
+            display: block;
+            padding: 10px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        
+        .catalog a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .catalog a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .spell-section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(5px);
+        }
+        
+        .spell-title {
+            color: #667eea;
+            font-size: 26px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .spell-content {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            line-height: 2;
+            font-size: 16px;
+            color: #333;
+            text-align: justify;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .spell-content p {
+            margin-bottom: 15px;
+            text-indent: 2em;
+        }
+        
+        .spell-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        /* 模式切换按钮样式 */
+        .mode-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .mode-toggle:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        /* 暗黑模式样式 */
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .container {
+            background: #2d2d2d;
+        }
+        
+        body.dark-mode .sidebar {
+            background: rgba(45, 45, 45, 0.95);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(80, 80, 80, 0.5);
+        }
+        
+        body.dark-mode .catalog a {
+            color: #ccc;
+        }
+        
+        body.dark-mode .catalog a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        body.dark-mode .catalog a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        body.dark-mode .main-content {
+            background: rgba(45, 45, 45, 0.85);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        body.dark-mode .header h1 {
+            color: #667eea;
+        }
+        
+        body.dark-mode .spell-section {
+            background: rgba(50, 50, 50, 0.7);
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+        }
+        
+        body.dark-mode .spell-title {
+            color: #667eea;
+        }
+        
+        body.dark-mode .spell-content {
+            background: rgba(60, 60, 60, 0.9);
+            color: #e0e0e0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        body.dark-mode .spell-note {
+            background: #3a3a2a;
+            border-left: 4px solid #d4af37;
+            color: #e0d0a0;
+        }
+        
+        body.dark-mode .back-to-top {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+        
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: #667eea;
+        }
+        
+        body.dark-mode .catalog-mini {
+            background: rgba(45, 45, 45, 0.95);
+            border: 1px solid rgba(80, 80, 80, 0.5);
+        }
+        
+        body.dark-mode .catalog-mini-text {
+            color: #667eea;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .mode-toggle {
+                width: 45px;
+                height: 45px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 20px;
+            }
+            
+            body.dark-mode .sidebar {
+                box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            }
+            
+            body.dark-mode .spell-section {
+                background: rgba(50, 50, 50, 0.7);
+                border-left: 4px solid #667eea;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                backdrop-filter: blur(3px);
+            }
+            
+            body.dark-mode .spell-content {
+                background: rgba(60, 60, 60, 0.9);
+                border: 1px solid rgba(102, 126, 234, 0.2);
+            }
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            transition: all 0.3s;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .back-to-top.show {
+            display: block;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏目录 -->
+        <aside class="sidebar" id="sidebar">
+            <h2 id="catalogTitle">
+                <span class="text">📖 目录</span>
+                <span class="icon">×</span>
+            </h2>
+            <div class="catalog-wrapper">
+                <ul class="catalog" id="catalog">
+                    <li><a href="#jinguang">金光神咒</a></li>
+                    <li><a href="#jingxin">净心神咒</a></li>
+                    <li><a href="#jingkou">净口神咒</a></li>
+                    <li><a href="#jingshen">净身神咒</a></li>
+                    <li><a href="#anshen">安土地神咒</a></li>
+                    <li><a href="#jingtian">净天地神咒</a></li>
+                    <li><a href="#zhuxiang">祝香咒</a></li>
+                    <li><a href="#xuanyun">玄蕴咒</a></li>
+                </ul>
+            </div>
+        </aside>
+        
+        <!-- 收起的小方块 -->
+        <div class="catalog-mini" id="catalogMini">
+            <div class="catalog-mini-text">目录</div>
+        </div>
+        
+        <!-- 主要内容 -->
+        <main class="main-content">
+            <div class="header">
+                <h1>道教八大神咒</h1>
+                <p>诚心诵念，福泽绵长</p>
+            </div>
+            
+            <!-- 金光神咒 -->
+            <section class="spell-section" id="jinguang">
+                <h2 class="spell-title">金光神咒</h2>
+                <div class="spell-content" data-spell-id="jinguang">
+                    <p>天地玄宗,万炁本根。</p>
+                    <p>广修亿劫,证吾神通。</p>
+                    <p>三界内外,惟道独尊。</p>
+                    <p>体有金光,覆映吾身。</p>
+                    <p>视之不见,听之不闻。</p>
+                    <p>包罗天地,养育群生。</p>
+                    <p>受持万遍,身有光明。</p>
+                    <p>三界侍卫,五帝司迎。</p>
+                    <p>万神朝礼,役使雷霆。</p>
+                    <p>鬼妖丧胆,精怪忘形。</p>
+                    <p>内有霹雳,雷神隐名。</p>
+                    <p>洞慧交彻,五炁腾腾。</p>
+                    <p>金光速现,覆护真人。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>驱除魔障、护身辟邪,还是雷霆召炼、修炼法宝的关键咒语。长期受持据说能让自身生出金光,得到三界神明护持,震慑妖魔鬼怪。
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 净心神咒 -->
+            <section class="spell-section" id="jingxin">
+                <h2 class="spell-title">净心神咒</h2>
+                <div class="spell-content" data-spell-id="jingxin">
+                    <p>太上台星,应变无停。</p>
+                    <p>驱邪缚魅,保命护身。</p>
+                    <p>智慧明净,心神安宁。</p>
+                    <p>三魂永久,魄无丧倾。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>早晚修行或炼符时净化心灵、排除杂念、稳定心神,同时还有护魂守魄的作用,帮助修行者摒弃尘世烦恼,进入清净的修行状态。
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 净口神咒 -->
+            <section class="spell-section" id="jingkou">
+                <h2 class="spell-title">净口神咒</h2>
+                <div class="spell-content" data-spell-id="jingkou">
+                    <p>丹朱口神,吐秽除氛。</p>
+                    <p>舌神正伦,通命养神。</p>
+                    <p>罗千齿神,却邪卫真。</p>
+                    <p>喉神虎贲,炁神引津。</p>
+                    <p>心神丹元,令我通真。</p>
+                    <p>思神炼液,道炁常存。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>用于涤除口中秽气、消除言语上的罪孽。世人难免有妄言、谤经等口业,且日常饮食的荤腥易沾染口气,诵此咒可清净口舌,方便后续诵经念咒时通真达道。
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 净身神咒 -->
+            <section class="spell-section" id="jingshen">
+                <h2 class="spell-title">净身神咒</h2>
+                <div class="spell-content" data-spell-id="jingshen">
+                    <p>灵宝天尊,安抚身形。</p>
+                    <p>弟子魂魄,五脏受命于玄冥。</p>
+                    <p>青龙白虎,列队守卫。</p>
+                    <p>朱雀玄武,忠诚侍卫我真身。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>让体内四正之神归位,消除因杀盗淫等罪业对身体的影响。诵念后可使修行者身体清净,以纯净之躯感召神灵庇佑,为修行打下身体层面的基础。
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 安土地神咒 -->
+            <section class="spell-section" id="anshen">
+                <h2 class="spell-title">安土地神咒</h2>
+                <div class="spell-content" data-spell-id="anshen">
+                    <p>元始天尊,安镇四方。</p>
+                    <p>普告万灵,岳渎真官。</p>
+                    <p>土地祗灵,左右社稷。</p>
+                    <p>不得妄惊,回向正道。</p>
+                    <p>内外澄清,各安其位。</p>
+                    <p>保卫坛庭,太上有命。</p>
+                    <p>搜捕邪精,护法神王。</p>
+                    <p>保卫诵经,皈依大道。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>多在结坛行法时使用,用于召遣土地山神。既能代凡人奏告上天,又能让土地神灵护佑修行之地,驱散邪精,保障修行环境的安宁,让诵经、修行等活动顺利进行。
+                    </div>
+                </div>
+            </section>
+                
+            <!-- 净天地神咒 -->
+            <section class="spell-section" id="jingtian">
+                <h2 class="spell-title">净天地神咒</h2>
+                <div class="spell-content" data-spell-id="jingtian">
+                    <p>天地万物,自然运转。</p>
+                    <p>污秽之气,逐渐消散。</p>
+                    <p>洞中玄妙,虚空之中。</p>
+                    <p>太元之气,明亮晃荡。</p>
+                    <p>八方神明,威严无比。</p>
+                    <p>听我召唤,自然响应。</p>
+                    <p>灵宝符命,普告九天之上。</p>
+                    <p>神明听令,魔王束手。</p>
+                    <p>乾罗答那,洞罡太玄。</p>
+                    <p>斩妖缚邪,度人万千。</p>
+                    <p>中山神咒,元始玉文。</p>
+                    <p>持诵一遍,却病延年。</p>
+                    <p>五岳八海,皆知我名。</p>
+                    <p>侍卫我轩,凶秽消散。</p>
+                    <p>道炁常存,正气浩然。</p>
+                    <p>保天地长存,安人民安康。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>侧重扫荡天地间的污秽邪气。诵念此咒可召唤八方威神,斩妖缚邪,既能净化修行的外在环境,还能起到却病延年的祈愿效果,让天地间正气充盈。
+                    </div>
+                </div>
+            </section>
+                
+            <!-- 祝香咒 -->
+            <section class="spell-section" id="zhuxiang">
+                <h2 class="spell-title">祝香咒</h2>
+                <div class="spell-content" data-spell-id="zhuxiang">
+                    <p>道由心学,心假香传。</p>
+                    <p>香爇玉炉,心存帝前。</p>
+                    <p>真灵下盼,仙旆临轩。</p>
+                    <p>令臣关告,迳达九天。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>核心是借助香火传递修行者的心意给神明。通过虔诚诵念,强化自身的心灵信仰,搭建与神明沟通的桥梁,祈求神明降临庇佑,同时获得心灵层面的辟邪力量。
+                    </div>
+                </div>
+            </section>
+                
+            <!-- 玄蕴咒 -->
+            <section class="spell-section" id="xuanyun">
+                <h2 class="spell-title">玄蕴咒</h2>
+                <div class="spell-content" data-spell-id="xuanyun">
+                    <p>云篆太虚,浩劫之初。</p>
+                    <p>乍遐乍迩,或沉或浮。</p>
+                    <p>五方徘徊,一丈之余。</p>
+                    <p>天真皇人,按笔乃书。</p>
+                    <p>以演洞章,次书灵符。</p>
+                    <p>元始下降,真文诞敷。</p>
+                    <p>昭昭其有,冥冥其无。</p>
+                    <p>沉疴能自痊,尘劳溺可扶。</p>
+                    <p>幽冥将有赖,由是升仙都。</p>
+                    <div class="spell-note">
+                        <strong>功用:</strong>诵念此咒可与各路仙真神将结下缘分。传说它既能帮助治愈重病、摆脱尘世烦恼,还能助力幽冥众生,而修行者日后法术有成时,也能得到所结缘仙神的助力。
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop">↑</button>
+
+    <script>
+        // 目录高亮和平滑滚动
+        const catalogLinks = document.querySelectorAll('.catalog a');
+        const sections = document.querySelectorAll('.spell-section');
+        const sidebar = document.getElementById('sidebar');
+        const catalogTitle = document.getElementById('catalogTitle');
+        const catalogMini = document.getElementById('catalogMini');
+        
+        // 移动端目录展开/收起功能
+        let isMobile = window.innerWidth <= 768;
+        
+        // 检测是否是移动设备
+        function checkMobile() {
+            isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                // 移动端：默认显示小方块
+                catalogMini.classList.remove('hidden');
+                sidebar.classList.remove('show');
+            } else {
+                // 桌面端：显示侧边栏，隐藏小方块
+                catalogMini.classList.add('hidden');
+                sidebar.classList.add('show');
+            }
+        }
+        
+        // 初始化
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        // 点击小方块，展开完整目录
+        catalogMini.addEventListener('click', function() {
+            if (isMobile) {
+                catalogMini.classList.add('hidden');
+                sidebar.classList.add('show');
+            }
+        });
+        
+        // 点击标题，收起目录
+        catalogTitle.addEventListener('click', function() {
+            if (isMobile) {
+                sidebar.classList.remove('show');
+                catalogMini.classList.remove('hidden');
+            }
+        });
+        
+        // 滚动时自动收起目录（仅移动端）
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            if (!isMobile) return;
+            
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 向下滚动且不在顶部时，自动收起
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                if (sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                    catalogMini.classList.remove('hidden');
+                }
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+        
+        // 点击目录链接平滑滚动
+        catalogLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    // 移动端点击后收起目录
+                    if (isMobile) {
+                        sidebar.classList.remove('show');
+                        catalogMini.classList.remove('hidden');
+                    }
+                    
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // 滚动时高亮当前目录项
+        window.addEventListener('scroll', function() {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            catalogLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // 返回顶部按钮显示/隐藏
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+        
+        // 返回顶部功能
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // 初始化第一个目录项为激活状态
+        if (catalogLinks.length > 0) {
+            catalogLinks[0].classList.add('active');
+        }
+        
+        // 模式切换功能
+        const modeToggle = document.createElement('button');
+        modeToggle.className = 'mode-toggle';
+        modeToggle.innerHTML = '🌙';
+        modeToggle.title = '切换到暗黑模式';
+        document.body.appendChild(modeToggle);
+        
+        // 从本地存储读取模式设置
+        const savedMode = localStorage.getItem('darkMode');
+        if (savedMode === 'true') {
+            document.body.classList.add('dark-mode');
+            modeToggle.innerHTML = '☀️';
+            modeToggle.title = '切换到明亮模式';
+        }
+        
+        // 切换模式
+        modeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                modeToggle.innerHTML = '☀️';
+                modeToggle.title = '切换到明亮模式';
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                modeToggle.innerHTML = '🌙';
+                modeToggle.title = '切换到暗黑模式';
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    </script>
+</body>
+</html>

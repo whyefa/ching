@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生辰八字查询工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft Yahei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .date-selector {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .time-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+        }
+        
+        select:hover {
+            border-color: #999;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        
+        .result-item {
+            margin-bottom: 12px;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        
+        .result-label {
+            display: inline-block;
+            width: 120px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .result-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .bazi-chars {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .bazi-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .bazi-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .bazi-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .warning {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #fff3cd;
+            color: #856404;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌙 生辰八字查询工具</h1>
+        <p class="subtitle">输入阳历生日，查询阴历生辰八字</p>
+        
+        <div class="input-group">
+            <label>📅 选择出生日期（阳历）</label>
+            <div class="date-selector">
+                <select id="yearSelect"></select>
+                <select id="monthSelect"></select>
+                <select id="daySelect"></select>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>⏰ 选择出生时辰</label>
+            <div class="time-selector">
+                <select id="hourSelect"></select>
+                <select id="minuteSelect"></select>
+            </div>
+        </div>
+        
+        <button id="calculateBtn">开始查询</button>
+        
+        <div class="result" id="resultBox">
+            <h3>📊 查询结果</h3>
+            
+            <div class="result-item">
+                <span class="result-label">阳历生日：</span>
+                <span class="result-value" id="solarDate"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">阴历生日：</span>
+                <span class="result-value" id="lunarDate"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">生肖属相：</span>
+                <span class="result-value" id="zodiac"></span>
+            </div>
+            
+            <h3 style="margin-top: 20px;">🎋 生辰八字</h3>
+            <div class="bazi-chars">
+                <div class="bazi-item">
+                    <div class="bazi-label">年柱</div>
+                    <div class="bazi-value" id="yearPillar">甲子</div>
+                </div>
+                <div class="bazi-item">
+                    <div class="bazi-label">月柱</div>
+                    <div class="bazi-value" id="monthPillar">乙丑</div>
+                </div>
+                <div class="bazi-item">
+                    <div class="bazi-label">日柱</div>
+                    <div class="bazi-value" id="dayPillar">丙寅</div>
+                </div>
+                <div class="bazi-item">
+                    <div class="bazi-label">时柱</div>
+                    <div class="bazi-value" id="hourPillar">丁卯</div>
+                </div>
+            </div>
+            
+            <div class="result-item" style="margin-top: 20px;">
+                <span class="result-label">五行命数：</span>
+                <span class="result-value" id="wuxing"></span>
+            </div>
+            
+            <div class="warning">
+                ⚠️ 注：本工具仅供娱乐参考，不具备科学依据
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 天干地支
+        const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const diZhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        const zodiacAnimals = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+        
+        // 六十甲子纳音五行对照表
+        const nayin = [
+            '海中金', '海中金', '炉中火', '炉中火', '大林木', '大林木', '路旁土', '路旁土', '剑锋金', '剑锋金',
+            '山头火', '山头火', '涧下水', '涧下水', '城头土', '城头土', '白蜡金', '白蜡金', '杨柳木', '杨柳木',
+            '泉中水', '泉中水', '屋上土', '屋上土', '霹雳火', '霹雳火', '松柏木', '松柏木', '长流水', '长流水',
+            '沙中金', '沙中金', '山下火', '山下火', '平地木', '平地木', '壁上土', '壁上土', '金箔金', '金箔金',
+            '覆灯火', '覆灯火', '天河水', '天河水', '大驿土', '大驿土', '钗钏金', '钗钏金', '桑柘木', '桑柘木',
+            '大溪水', '大溪水', '沙中土', '沙中土', '天上火', '天上火', '石榴木', '石榴木', '大海水', '大海水'
+        ];
+        
+        const wuxingMap = {
+            '甲': '木', '乙': '木',
+            '丙': '火', '丁': '火',
+            '戊': '土', '己': '土',
+            '庚': '金', '辛': '金',
+            '壬': '水', '癸': '水'
+        };
+        
+        // 时辰对照表
+        const shiChen = [
+            { name: '子时', range: '23:00-01:00', zhi: '子' },
+            { name: '丑时', range: '01:00-03:00', zhi: '丑' },
+            { name: '寅时', range: '03:00-05:00', zhi: '寅' },
+            { name: '卯时', range: '05:00-07:00', zhi: '卯' },
+            { name: '辰时', range: '07:00-09:00', zhi: '辰' },
+            { name: '巳时', range: '09:00-11:00', zhi: '巳' },
+            { name: '午时', range: '11:00-13:00', zhi: '午' },
+            { name: '未时', range: '13:00-15:00', zhi: '未' },
+            { name: '申时', range: '15:00-17:00', zhi: '申' },
+            { name: '酉时', range: '17:00-19:00', zhi: '酉' },
+            { name: '戌时', range: '19:00-21:00', zhi: '戌' },
+            { name: '亥时', range: '21:00-23:00', zhi: '亥' }
+        ];
+        
+        // 初始化选择器
+        function initSelectors() {
+            const yearSelect = document.getElementById('yearSelect');
+            const monthSelect = document.getElementById('monthSelect');
+            const daySelect = document.getElementById('daySelect');
+            const hourSelect = document.getElementById('hourSelect');
+            const minuteSelect = document.getElementById('minuteSelect');
+            
+            // 年份：1900-2100
+            for (let i = 1900; i <= 2100; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + '年';
+                if (i === 1990) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+            
+            // 月份：1-12
+            for (let i = 1; i <= 12; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + '月';
+                if (i === 1) option.selected = true;
+                monthSelect.appendChild(option);
+            }
+            
+            // 日期：1-31（动态更新）
+            updateDays();
+            
+            // 小时：0-23
+            for (let i = 0; i <= 23; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = String(i).padStart(2, '0') + '时';
+                if (i === 0) option.selected = true;
+                hourSelect.appendChild(option);
+            }
+            
+            // 分钟：0-59（每5分钟）
+            for (let i = 0; i < 60; i += 5) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = String(i).padStart(2, '0') + '分';
+                if (i === 0) option.selected = true;
+                minuteSelect.appendChild(option);
+            }
+            
+            // 监听年月变化，更新日期
+            yearSelect.addEventListener('change', updateDays);
+            monthSelect.addEventListener('change', updateDays);
+        }
+        
+        // 更新日期选择器
+        function updateDays() {
+            const yearSelect = document.getElementById('yearSelect');
+            const monthSelect = document.getElementById('monthSelect');
+            const daySelect = document.getElementById('daySelect');
+            
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            const currentDay = parseInt(daySelect.value) || 1;
+            daySelect.innerHTML = '';
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + '日';
+                if (i === Math.min(currentDay, daysInMonth)) option.selected = true;
+                daySelect.appendChild(option);
+            }
+        }
+        
+        // 获取干支纪年
+        function getGanZhi(year) {
+            const ganIndex = (year - 4) % 10;
+            const zhiIndex = (year - 4) % 12;
+            return tianGan[ganIndex] + diZhi[zhiIndex];
+        }
+        
+        // 获取六十甲子序号（0-59）
+        function getJiaZiIndex(year) {
+            // 公元4年是甲子年，以此为基准
+            return (year - 4) % 60;
+        }
+        
+        // 根据年份获取纳音五行
+        function getNaYin(year) {
+            const index = getJiaZiIndex(year);
+            return nayin[index];
+        }
+        
+        // 获取生肖
+        function getZodiac(year) {
+            return zodiacAnimals[(year - 4) % 12];
+        }
+        
+        // 简化的阴历转换（这里使用近似算法，实际应用需要完整的万年历数据）
+        function solarToLunar(year, month, day) {
+            // 这是一个简化版本，实际项目中需要使用完整的农历算法库
+            // 这里仅做演示，返回一个近似值
+            const lunarMonths = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+            const approxMonth = ((month + 1) % 12);
+            const approxDay = Math.max(1, day - 10);
+            
+            return {
+                year: year,
+                month: lunarMonths[approxMonth],
+                day: approxDay
+            };
+        }
+        
+        // 根据时辰获取地支
+        function getHourZhi(hour) {
+            if (hour === 23 || hour === 0) return '子';
+            const index = Math.floor((hour + 1) / 2);
+            return shiChen[index].zhi;
+        }
+        
+        // 获取时辰名称
+        function getShiChenName(hour) {
+            if (hour === 23) return shiChen[0].name;
+            const index = Math.floor((hour + 1) / 2);
+            return shiChen[index].name;
+        }
+        
+        // 计算生辰八字
+        function calculateBazi() {
+            const year = parseInt(document.getElementById('yearSelect').value);
+            const month = parseInt(document.getElementById('monthSelect').value);
+            const day = parseInt(document.getElementById('daySelect').value);
+            const hour = parseInt(document.getElementById('hourSelect').value);
+            const minute = parseInt(document.getElementById('minuteSelect').value);
+            
+            // 年柱
+            const yearGanZhi = getGanZhi(year);
+            
+            // 月柱（简化计算，实际需要考虑节气）
+            const monthGanIndex = (year * 12 + month) % 10;
+            const monthZhiIndex = (month + 1) % 12;
+            const monthGanZhi = tianGan[monthGanIndex] + diZhi[monthZhiIndex];
+            
+            // 日柱（简化计算）
+            const dayGanIndex = (year + month + day) % 10;
+            const dayZhiIndex = (year + month + day) % 12;
+            const dayGanZhi = tianGan[dayGanIndex] + diZhi[dayZhiIndex];
+            
+            // 时柱
+            const hourZhi = getHourZhi(hour);
+            const hourGanIndex = (dayGanIndex * 2 + Math.floor(hour / 2)) % 10;
+            const hourGanZhi = tianGan[hourGanIndex] + hourZhi;
+            
+            // 阴历日期（简化）
+            const lunar = solarToLunar(year, month, day);
+            
+            // 生肖
+            const zodiac = getZodiac(year);
+            
+            // 纳音五行（正确算法）
+            const nayinMing = getNaYin(year);
+            
+            // 显示结果
+            document.getElementById('solarDate').textContent = 
+                `${year}年${month}月${day}日 ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+            
+            document.getElementById('lunarDate').textContent = 
+                `农历${lunar.year}年${lunar.month}月${lunar.day}日 ${getShiChenName(hour)}`;
+            
+            document.getElementById('zodiac').textContent = zodiac;
+            
+            document.getElementById('yearPillar').textContent = yearGanZhi;
+            document.getElementById('monthPillar').textContent = monthGanZhi;
+            document.getElementById('dayPillar').textContent = dayGanZhi;
+            document.getElementById('hourPillar').textContent = hourGanZhi;
+            
+            document.getElementById('wuxing').textContent = nayinMing;
+            
+            // 显示结果区域
+            document.getElementById('resultBox').classList.add('show');
+            
+            // 滚动到结果
+            document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // 初始化
+        initSelectors();
+        
+        // 绑定按钮事件
+        document.getElementById('calculateBtn').addEventListener('click', calculateBazi);
+    </script>
+</body>
+</html>
