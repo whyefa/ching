@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周易名字打分工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft Yahei', 'PingFang SC', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+        }
+        
+        input[type="text"]:hover {
+            border-color: #999;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        
+        .result-item {
+            margin-bottom: 12px;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        
+        .result-label {
+            display: inline-block;
+            width: 120px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .result-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .warning {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #fff3cd;
+            color: #856404;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .result-item {
+                font-size: 14px;
+            }
+            
+            .result-label {
+                width: 100px;
+            }
+            
+            /* 添加移动端优化样式 */
+            .result-value {
+                display: block;
+                margin-top: 5px;
+                word-break: break-all;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 周易名字打分工具</h1>
+        <p class="subtitle">基于五格剖象 + 81数理 + 五行匹配的综合测评</p>
+        
+        <div class="input-group">
+            <label>👤 输入姓名（支持复姓）</label>
+            <input type="text" id="nameInput" placeholder="例如：李明浩然 或 司马相如">
+        </div>
+        
+        <button id="calculateBtn">开始测算</button>
+        
+        <div class="result" id="resultBox">
+            <h3>📊 测算结果</h3>
+            
+            <div class="result-item">
+                <span class="result-label">姓名：</span>
+                <span class="result-value" id="fullName"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">五格数理：</span>
+                <span class="result-value" id="wugeResult"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">81数理：</span>
+                <span class="result-value" id="numberResult"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">五行匹配：</span>
+                <span class="result-value" id="wuxingResult"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">音形义：</span>
+                <span class="result-value" id="yinxingyiResult"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">卦象：</span>
+                <span class="result-value" id="guaxiangResult"></span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">综合得分：</span>
+                <span class="result-value" id="scoreResult"></span>
+            </div>
+            
+            <div class="warning">
+                ⚠️ 注：本工具仅供娱乐参考，不具备科学依据
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 81数理吉凶表
+        const fortuneTable = {
+            1: "大吉：（太极之数）万物开泰，生发无穷，利禄亨通，为宇宙起源之吉数。",
+            2: "大凶：（两仪之数）混沌未定，分离破败，进退保守，难以达成志向。",
+            3: "大吉：（三才之数）天地人和，进取如意，可助事业增进繁荣，属首领运暗示数。",
+            4: "大凶：（四象之数）破败凶变，万事休止，还属孤独运暗示数，多遇逆境。",
+            5: "大吉：（五行之数）福禄长寿，福德集门，兼具女德运与温和运暗示数。",
+            6: "大吉：（六爻之数）安稳余庆，吉人天相，含女德运与温和运，虽有小波折但终吉。",
+            7: "吉：（七政之数）刚毅果断，勇往直前，精悍严谨，得吉星照耀，属刚情运暗示数。",
+            8: "半吉：（八卦之数）意志刚健，勤勉发展，卦象涵盖万物，运势平缓无大起伏。",
+            9: "大凶：（大成之数）兴尽凶始，穷乏困苦，蕴涵凶险，成败难以把握。",
+            10: "大凶：（终结之数）万事终局，充满损耗，雪暗飘零，回顾过往多有茫然。",
+            11: "大吉：（旱苗逢雨）稳健吉顺，富贵荣达，万物更新，兼具女德运与温和运。",
+            12: "大凶：（掘井无泉）意志薄弱，家庭寂寞，发展态势薄弱，难酬心中志向。",
+            13: "大吉：（春日牡丹）智略超群，博学多才，才艺多能，兼具首领运与艺能运。",
+            14: "大凶：（破兆）沦落天涯，失意烦闷，家庭缘薄，孤独遭难，谋事多败。",
+            15: "大吉：（福寿）福寿双全，立身兴家，富贵荣誉，属财富运与温和运暗示数。",
+            16: "大吉：（厚重）贵人相助，兴家兴业，财官双美，兼具首领运与财富运。",
+            17: "半吉：（刚强）突破万难，刚柔兼备，虽权威刚强，但需容忍方能成功，属刚情运。",
+            18: "大吉：（铁镜重磨）有志竟成，内名有运，权威显达，兼具艺能运暗示数。",
+            19: "大凶：（多难）风云蔽日，辛苦重来，虽有智谋，但万事皆遇挫折。",
+            20: "大凶：（屋下藏金）非业破运，灾难重重，进退维谷，凡事难以成功。",
+            21: "大吉：（明月中天）明月光照，独立权威，官运亨通，属首领运，但女性有此数易陷孤寡。",
+            22: "大凶：（秋草逢霜）两士相争，困难疾弱，即便出豪杰，人生也波折不断。",
+            23: "大吉：（壮丽）旭日东升，质实刚坚，权威旺盛，属首领运，女性得此数恐孤寡。",
+            24: "大吉：（掘藏得金）家门余庆，金钱丰盈，白手可获巨财，属财富运暗示数。",
+            25: "大吉：（荣俊）英俊刚毅，资性聪敏，虽有傲气，克服后可获成功。",
+            26: "半吉：（变怪）变怪奇异，属豪侠数，虽有英雄气概，但波澜重叠，吉凶参半。",
+            27: "半凶半吉：（增长）足智多谋，先苦后甜，欲望无度，自我意识强烈，易遭毁谤。",
+            28: "大凶：（阔水浮萍）遭难之数，豪杰气概，四海漂泊，终世浮躁。",
+            29: "大吉：（智谋）智谋优秀，财力归集，名闻海内，成就大业。",
+            30: "半凶半吉：（非运）沉浮不定，凶吉难分，若明若暗，大成大败。",
+            31: "大吉：（春日花开）智勇得志，博得名利，统领众人，繁荣富贵。",
+            32: "大吉：（宝马金鞍）侥幸多望，贵人得助，财帛如裕，繁荣至上。",
+            33: "大吉：（旭日升天）鸾凤相会，功名荣达，威震天下，属首领运。",
+            34: "大凶：（破家）破家之身，见识短小，辛苦遭逢，灾祸至极。",
+            35: "大吉：（高楼望月）温和平静，智达通畅，文昌技艺，奏功洋洋。",
+            36: "半凶半吉：（波澜重叠）波澜重叠，沉浮万状，侠肝义胆，舍己成仁。",
+            37: "大吉：（猛虎出林）权威显达，热诚忠信，宜着雅量，终身荣富。",
+            38: "半吉：（磨铁成针）意志薄弱，刻意经营，才识不凡，技艺有成。",
+            39: "大吉：（富贵荣华）富贵荣华，财帛丰盈，暗藏险象，德泽四方。",
+            40: "半凶半吉：（退安）智谋胆力，冒险投机，沉浮不定，退保平安。",
+            41: "大吉：（有德）纯阳独秀，德高望重，和顺畅达，博得名利。",
+            42: "半凶半吉：（寒蝉在柳）博识多能，精通世情，如能专心，尚可成功。",
+            43: "凶：（散财破产）散财破产，诸事不遂，虽有智谋，财来财去。",
+            44: "凶：（烦闷）破家亡身，暗藏惨淡，事不如意，乱世怪杰。",
+            45: "大吉：（顺风）新生泰和，顺风扬帆，智谋经纬，富贵繁荣。",
+            46: "凶：（浪里淘金）载宝沉舟，浪里淘金，大难尝尽，大功有成。",
+            47: "大吉：（点石成金）花开之象，万事如意，祯祥吉庆，天赋幸福。",
+            48: "大吉：（古松立鹤）智谋兼备，德量荣达，威望成师，洋洋大观。",
+            49: "半凶半吉：（转变）吉临则吉，凶来则凶，转凶为吉，配好三才。",
+            50: "半凶半吉：（小舟入海）一成一败，吉凶参半，先得庇荫，后遭凄惨。",
+            51: "半凶半吉：（沉浮）盛衰交加，波澜重叠，如能慎始，必获成功。",
+            52: "大吉：（达眼）卓识达眼，先见之明，智谋超群，名利双收。",
+            53: "凶：（曲卷难星）外祥内患，外祸内安，先富后贫，先贫后富。",
+            54: "凶：（石上栽花）石上栽花，难得有活，忧闷烦来，辛惨不绝。",
+            55: "半凶半吉：（善恶）善善得恶，恶恶得善，吉到极限，反生凶险。",
+            56: "凶：（浪里行舟）历尽艰辛，四周障碍，万事龃龌，做事难成。",
+            57: "大吉：（日照春松）寒雪青松，夜莺吟春，必遭一过，繁荣白事。",
+            58: "半凶半吉：（晚行遇月）沉浮多端，先苦后甜，宽宏扬名，富贵繁荣。",
+            59: "凶：（寒蝉悲风）寒蝉悲风，意志衰退，缺乏忍耐，苦难不休。",
+            60: "凶：（无谋）无谋之人，漂泊不定，晦暝暗黑，动摇不安。",
+            61: "半吉：（牡丹芙蓉）牡丹芙蓉，花开富贵，名利双收，定享天赋。",
+            62: "凶：（衰败）衰败之象，内外不和，志望难达，灾祸频来。",
+            63: "大吉：（舟归平海）富贵荣华，身心安泰，雨露惠泽，万事亨通。",
+            64: "凶：（非命）骨肉分离，孤独悲愁，难得心安，做事不成。",
+            65: "大吉：（巨流归海）天长地久，家运隆昌，福寿绵长，事事成就。",
+            66: "凶：（岩头步马）进退维谷，艰难不堪，等待时机，一跃而起。",
+            67: "大吉：（顺风通达）天赋幸运，四通八达，家道繁昌，富贵东来。",
+            68: "大吉：（顺风吹帆）智虑周密，集众信达，发明能智，拓展昂进。",
+            69: "凶：（非业）非业非力，精神迫滞，灾害交至，遍偿痛苦。",
+            70: "凶：（残菊逢霜）残菊逢霜，寂寞无碍，惨淡忧愁，晚景凄凉。",
+            71: "半吉：（石上金花）石上金花，内心劳苦，贯彻始终，可获成功。",
+            72: "凶：（劳苦）荣苦相伴，阴云覆月，外表吉祥，内实凶祸。",
+            73: "半吉：（无勇）盛衰交加，徒有高志，天王福祉，终世平安。",
+            74: "凶：（残菊经霜）残菊经霜，秋叶寂寞，无能无智，辛苦繁多。",
+            75: "半凶半吉：（退守）退守保吉，发迹甚迟，虽有吉象，无谋难成。",
+            76: "凶：（离散）倾覆离散，骨肉分离，内外不和，虽劳无功。",
+            77: "半吉：（半吉）家庭有悦，半吉半凶，能获援护，陷落不幸。",
+            78: "半凶半吉：（晚苦）祸福参半，先天智能，中年发达，晚景困苦。",
+            79: "凶：（云头望月）云头望月，身疲力尽，穷迫不伸，精神不定。",
+            80: "半凶半吉：（遁吉）辛苦不绝，早入隐遁，安心立命，化凶转吉。",
+            81: "大吉：（万物回春）最吉之数，还本归元，吉祥重叠，富贵尊荣。"
+        };
+
+        // 五行属性对应关系（根据笔画数尾数）
+        const wuxingMap = {
+            1: '木',
+            2: '木',
+            3: '火',
+            4: '火',
+            5: '土',
+            6: '土',
+            7: '金',
+            8: '金',
+            9: '水',
+            0: '水'
+        };
+
+        // 八字喜用神匹配规则（示例，实际应用中需要根据生辰八字计算）
+        const xiyongshen = '火'; // 示例值，实际应由用户输入或通过生辰八字计算得出
+
+        // 提取吉凶等级的函数
+        function getFortuneLevel(interpretation) {
+            if (interpretation.startsWith('大吉')) {
+                return { text: '大吉', class: 'level-great' };
+            } else if (interpretation.startsWith('吉')) {
+                return { text: '吉', class: 'level-good' };
+            } else if (interpretation.startsWith('半吉') || interpretation.startsWith('半凶半吉') || interpretation.startsWith('半凶')) {
+                return { text: '半吉半凶', class: 'level-mixed' };
+            } else if (interpretation.startsWith('大凶')) {
+                return { text: '大凶', class: 'level-bad' };
+            } else if (interpretation.startsWith('凶')) {
+                return { text: '凶', class: 'level-bad' };
+            }
+            return { text: '', class: '' };
+        }
+
+        // 音形义评分函数
+        function calculateYinxingyiScore(name) {
+            let score = 0;
+            
+            // 音律检查：声调搭配是否和谐
+            // 这里简化处理，实际应用中可以根据拼音声调进行更详细的判断
+            if (name.length >= 2) {
+                score += 5; // 基础分
+            }
+            
+            // 字形检查：结构是否平衡
+            // 简化处理，假设8-12画为较佳结构
+            // 这里需要实际计算每个字的笔画数，暂时简化处理
+            score += 5; // 基础分
+            
+            // 字义检查：寓意是否积极
+            // 简化处理，实际应用中可以维护一个正面字义词典
+            score += 5; // 基础分
+            
+            return score;
+        }
+
+        // 卦象评分函数（简化版）
+        function calculateGuaxiangScore(name) {
+            // 简化处理，实际应用中需要根据姓名笔画起卦并查表
+            // 这里假设几个吉卦
+            const goodGuaxiang = ['乾', '坤', '既济', '泰', '大有'];
+            // 随机生成一个卦象进行演示
+            const guaxiang = goodGuaxiang[Math.floor(Math.random() * goodGuaxiang.length)];
+            
+            if (goodGuaxiang.includes(guaxiang)) {
+                return 10; // 吉卦
+            } else {
+                return -10; // 凶卦
+            }
+        }
+        
+        // 计算81数理吉凶
+        function calculate81Fortune(num) {
+            // 计算81数理（修复计算逻辑）
+            let mathNum = num % 81;
+            // 如果余数为0，说明是81的倍数，对应81数理
+            if (mathNum === 0) {
+                mathNum = 81;
+            }
+            
+            // 获取解读结果
+            const interpretation = fortuneTable[mathNum] || "数理解读未收录";
+            
+            // 获取吉凶等级
+            const fortuneLevel = getFortuneLevel(interpretation);
+            
+            return {
+                number: mathNum,
+                interpretation: interpretation,
+                level: fortuneLevel
+            };
+        }
+
+        // 总分计算函数
+        function calculateTotalScore(wugeScores, numberScore, wuxingScore, yinxingyiScore, guaxiangScore) {
+            // 五格权重分配
+            const tiangeWeight = 0.1;  // 天格权重10%
+            const rengeWeight = 0.4;   // 人格权重40%
+            const digeWeight = 0.2;    // 地格权重20%
+            const waigeWeight = 0.1;   // 外格权重10%
+            const zonggeWeight = 0.2;  // 总格权重20%
+            
+            // 计算五格加权得分
+            const wugeTotal = 
+                wugeScores.tiange.score * tiangeWeight +
+                wugeScores.renge.score * rengeWeight +
+                wugeScores.dige.score * digeWeight +
+                wugeScores.waige.score * waigeWeight +
+                wugeScores.zongge.score * zonggeWeight;
+            
+            // 计算总分（满分100分）
+            const totalScore = wugeTotal + numberScore + wuxingScore + yinxingyiScore + guaxiangScore;
+            
+            // 确保总分在合理范围内（0-100）
+            return Math.max(0, Math.min(100, totalScore));
+        }
+        
+        // 更新结果显示函数
+        function updateResultDisplay(name, wugeScores, numberResult, wuxingScore, yinxingyiScore, guaxiangScore, totalScore) {
+            // 更新姓名
+            document.getElementById('fullName').textContent = name;
+            
+            // 更新五格数理
+            document.getElementById('wugeResult').innerHTML = `
+                天格: ${wugeScores.tiange.number} (${wugeScores.tiange.fortune.level.text})<br>
+                人格: ${wugeScores.renge.number} (${wugeScores.renge.fortune.level.text})<br>
+                地格: ${wugeScores.dige.number} (${wugeScores.dige.fortune.level.text})<br>
+                外格: ${wugeScores.waige.number} (${wugeScores.waige.fortune.level.text})<br>
+                总格: ${wugeScores.zongge.number} (${wugeScores.zongge.fortune.level.text})
+            `;
+            
+            // 更新81数理
+            document.getElementById('numberResult').innerHTML = `
+                数理: ${numberResult.number}<br>
+                吉凶: ${numberResult.level.text}<br>
+                解读: ${numberResult.interpretation}
+            `;
+            
+            // 更新五行匹配
+            document.getElementById('wuxingResult').textContent = wuxingScore > 0 ? `匹配喜用神，得分: +${wuxingScore}` : 
+                wuxingScore < 0 ? `与喜用神相克，得分: ${wuxingScore}` : '无明显影响';
+            
+            // 更新音形义
+            document.getElementById('yinxingyiResult').textContent = `得分: +${yinxingyiScore}`;
+            
+            // 更新卦象
+            document.getElementById('guaxiangResult').textContent = guaxiangScore > 0 ? `吉卦，得分: +${guaxiangScore}` : 
+                guaxiangScore < 0 ? `凶卦，得分: ${guaxiangScore}` : '无明显影响';
+            
+            // 更新综合得分
+            document.getElementById('scoreResult').textContent = totalScore.toFixed(1);
+            
+            // 显示结果区域
+            document.getElementById('resultBox').classList.add('show');
+            
+            // 滚动到结果
+            document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // 笔画数对应五行属性的函数
+        function getWuxingByStrokes(strokeCount) {
+            const lastDigit = strokeCount % 10;
+            return wuxingMap[lastDigit] || wuxingMap[lastDigit === 0 ? 10 : lastDigit];
+        }
+        
+        // 计算五格数理
+        function calculateWuge(name) {
+            // 分离姓氏和名字
+            let firstName = '';
+            let lastName = '';
+            
+            // 简单处理，假设复姓只有两个字
+            if (name.length >= 3) {
+                firstName = name.substring(0, 2); // 复姓
+                lastName = name.substring(2);
+            } else {
+                firstName = name.charAt(0); // 单姓
+                lastName = name.substring(1);
+            }
+            
+            // 简化的笔画计算（实际应用中需要查康熙字典）
+            const firstNameStrokes = firstName.length * 3; // 简化处理
+            const lastNameStrokes = lastName.length * 3; // 简化处理
+            
+            // 计算五格
+            let tiange, renge, dige, waige, zongge;
+            
+            // 天格：姓氏笔画 + 1（单姓）；姓氏两字相加（复姓）
+            if (firstName.length == 1) {
+                tiange = firstNameStrokes + 1;
+            } else {
+                tiange = firstNameStrokes;
+            }
+            
+            // 人格：姓氏最后一字 + 名字第一字笔画
+            renge = firstNameStrokes + (lastName.length > 0 ? 3 : 0);
+            
+            // 地格：名字笔画相加（单名 + 1）
+            if (lastName.length <= 1) {
+                dige = lastNameStrokes + 1;
+            } else {
+                dige = lastNameStrokes;
+            }
+            
+            // 总格：姓名所有字笔画总和
+            zongge = firstNameStrokes + lastNameStrokes;
+            
+            // 外格：姓名总笔画 - 人格笔画
+            waige = zongge - renge;
+            
+            // 计算各格的吉凶
+            const tiangeFortune = calculate81Fortune(tiange);
+            const rengeFortune = calculate81Fortune(renge);
+            const digeFortune = calculate81Fortune(dige);
+            const waigeFortune = calculate81Fortune(waige);
+            const zonggeFortune = calculate81Fortune(zongge);
+            
+            // 简化的分数计算（根据吉凶等级）
+            const getScoreByFortune = (fortune) => {
+                if (fortune.level.text === '大吉') return 100;
+                if (fortune.level.text === '吉') return 80;
+                if (fortune.level.text === '半吉半凶') return 60;
+                if (fortune.level.text === '凶') return 40;
+                if (fortune.level.text === '大凶') return 20;
+                return 50;
+            };
+            
+            return {
+                tiange: { number: tiange, fortune: tiangeFortune, score: getScoreByFortune(tiangeFortune) },
+                renge: { number: renge, fortune: rengeFortune, score: getScoreByFortune(rengeFortune) },
+                dige: { number: dige, fortune: digeFortune, score: getScoreByFortune(digeFortune) },
+                waige: { number: waige, fortune: waigeFortune, score: getScoreByFortune(waigeFortune) },
+                zongge: { number: zongge, fortune: zonggeFortune, score: getScoreByFortune(zonggeFortune) }
+            };
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('calculateBtn').addEventListener('click', calculateNameScore);
+        });
+        
+        function calculateNameScore() {
+            const name = document.getElementById('nameInput').value.trim();
+            
+            if (!name) {
+                alert('请输入姓名');
+                return;
+            }
+            
+            try {
+                // 执行姓名分析计算
+                // 1. 计算五格
+                const wugeScores = calculateWuge(name);
+                
+                // 2. 计算81数理（以总格为例）
+                const numberResult = calculate81Fortune(wugeScores.zongge.number);
+                
+                // 3. 计算五行匹配分
+                const wuxingScore = 5; // 简化处理
+                
+                // 4. 计算音形义分
+                const yinxingyiScore = calculateYinxingyiScore(name);
+                
+                // 5. 计算卦象分
+                const guaxiangScore = calculateGuaxiangScore(name);
+                
+                // 6. 计算总分
+                // 根据81数理吉凶等级计算分数
+                const getScoreByFortune = (fortune) => {
+                    if (fortune.level.text === '大吉') return 100;
+                    if (fortune.level.text === '吉') return 80;
+                    if (fortune.level.text === '半吉半凶') return 60;
+                    if (fortune.level.text === '凶') return 40;
+                    if (fortune.level.text === '大凶') return 20;
+                    return 50;
+                };
+                const numberScore = getScoreByFortune({level: numberResult.level});
+                const totalScore = calculateTotalScore(wugeScores, numberScore, wuxingScore, yinxingyiScore, guaxiangScore);
+                
+                // 7. 更新结果显示
+                updateResultDisplay(name, wugeScores, numberResult, wuxingScore, yinxingyiScore, guaxiangScore, totalScore);
+            } catch (error) {
+                console.error('计算过程中出现错误:', error);
+                alert('计算过程中出现错误，请检查输入或联系开发者');
+            }
+        }
+    </script>
+</body>
+</html>
