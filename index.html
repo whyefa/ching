@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>道学文化与命理测算工具集</title>
+    <title>传统文化</title>
     <style>
         * {
             margin: 0;
@@ -54,11 +54,12 @@
         .tool-card {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             border-radius: 15px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             cursor: pointer;
             border: 2px solid transparent;
+            min-height: 180px;
         }
         
         .tool-card:hover {
@@ -164,13 +165,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏮 道学文化与命理测算工具集</h1>
-        <p class="subtitle">传承千年智慧，探索传统文化奥秘</p>
+        <h1>传统文化</h1>
         
         <div class="tools-grid">
+            <!-- 周易名字打分工具 -->
+            <div class="tool-card" onclick="window.location.href='name.html'">
+                <h2 class="tool-title">周易名字打分</h2>
+                <p class="tool-desc">基于五格剖象 + 81数理 + 五行匹配的综合测评工具，为您提供专业的姓名分析。</p>
+                <button class="enter-btn">开始测算</button>
+            </div>
+            
             <!-- 道教神咒工具 -->
             <div class="tool-card" onclick="window.location.href='zhou.html'">
-                <div class="tool-icon">🙏</div>
                 <h2 class="tool-title">道教八大神咒</h2>
                 <p class="tool-desc">学习道教经典八大神咒，了解其含义与用途。可用于修身养性、祈福辟邪。</p>
                 <button class="enter-btn">进入学习</button>
@@ -178,7 +184,6 @@
             
             <!-- 生辰八字工具 -->
             <div class="tool-card" onclick="window.location.href='bazi.html'">
-                <div class="tool-icon">📅</div>
                 <h2 class="tool-title">生辰八字查询</h2>
                 <p class="tool-desc">输入阳历生日时间，查询对应的阴历生辰八字与五行属性。</p>
                 <button class="enter-btn">开始查询</button>
@@ -186,15 +191,14 @@
             
             <!-- 手机号数理工具 -->
             <div class="tool-card" onclick="window.location.href='81.html'">
-                <div class="tool-icon">📱</div>
                 <h2 class="tool-title">手机号81数理</h2>
-                <p class="tool-desc">通过手机号码末四位数字，解读对应的81数理吉凶含义。</p>
+                <p class="tool-desc">解读数字81数理吉凶含义。</p>
                 <button class="enter-btn">立即解读</button>
             </div>
         </div>
         
         <div class="footer">
-            <p>传统文化娱乐工具集 | 仅供学习交流与娱乐参考</p>
+            <p>传统文化 | 仅供学习交流与娱乐参考</p>
             <p>所有内容均无科学依据，请理性对待</p>
         </div>
     </div>
